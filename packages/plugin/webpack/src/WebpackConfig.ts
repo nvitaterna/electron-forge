@@ -140,7 +140,7 @@ export default class WebpackConfigGenerator {
     };
     mainConfig.entry = fix(mainConfig.entry as EntryType);
 
-    return webpackMerge.smart({
+    return webpackMerge({
       devtool: 'source-map',
       target: 'electron-main',
       mode: this.mode,
@@ -174,7 +174,7 @@ export default class WebpackConfigGenerator {
       .resolveConfig(this.pluginConfig.renderer.preloadConfig || this.pluginConfig.renderer.config);
     const prefixedEntries = entryPoint.prefixedEntries || [];
 
-    return webpackMerge.smart({
+    return webpackMerge({
       devtool: 'inline-source-map',
       target: 'electron-preload',
       mode: this.mode,
@@ -204,9 +204,8 @@ export default class WebpackConfigGenerator {
 
     const defines = this.getDefines(false);
 
-    const useHtmlWebpackPlugin = !rendererConfig?.plugins?.find(
-      (plugin) => plugin.constructor && plugin.constructor.name === 'HtmlWebpackPlugin'
-    );
+    const useHtmlWebpackPlugin = !rendererConfig.plugins || !rendererConfig.plugins
+      .find((plugin) => plugin.constructor && plugin.constructor.name === 'HtmlWebpackPlugin');
 
     const plugins = entryPoints
       .filter((entryPoint) => Boolean(entryPoint.html) && useHtmlWebpackPlugin)
@@ -217,7 +216,7 @@ export default class WebpackConfigGenerator {
         chunks: [entryPoint.name].concat(entryPoint.additionalChunks || []),
       }) as webpack.Plugin).concat([new webpack.DefinePlugin(defines)])
       .concat(this.isProd ? [] : [new webpack.HotModuleReplacementPlugin()]);
-    return webpackMerge.smart({
+    return webpackMerge({
       entry,
       devtool: 'inline-source-map',
       target: 'electron-renderer',
