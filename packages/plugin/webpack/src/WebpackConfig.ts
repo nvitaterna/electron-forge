@@ -2,7 +2,7 @@ import debug from 'debug';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import path from 'path';
 import webpack, { Configuration } from 'webpack';
-import webpackMerge from 'webpack-merge';
+import { merge as webpackMerge } from 'webpack-merge';
 
 import { WebpackPluginConfig, WebpackPluginEntryPoint, WebpackPreloadEntryPoint } from './Config';
 
@@ -176,7 +176,6 @@ export default class WebpackConfigGenerator {
 
     return webpackMerge({
       devtool: 'inline-source-map',
-      target: 'electron-preload',
       mode: this.mode,
       entry: prefixedEntries.concat([
         entryPoint.js,
@@ -189,7 +188,9 @@ export default class WebpackConfigGenerator {
         __dirname: false,
         __filename: false,
       },
-    }, rendererConfig);
+    },
+    rendererConfig || {},
+    { target: 'electron-preload' });
   }
 
   async getRendererConfig(entryPoints: WebpackPluginEntryPoint[]) {
@@ -232,6 +233,6 @@ export default class WebpackConfigGenerator {
         __filename: false,
       },
       plugins,
-    }, rendererConfig);
+    }, rendererConfig || {});
   }
 }
